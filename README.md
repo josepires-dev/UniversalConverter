@@ -1,64 +1,75 @@
 # UniversalConverter
 
-> Ferramenta local PHP/Apache — compatível com XAMPP, Laragon, WAMP ou qualquer stack Apache+PHP 8.1+
-> Este projeto é exclusivamente para uso local com XAMPP/Apache numa máquina pessoal.
-> Não deve ser exposto à internet: o fetch de URLs não filtra redes internas por padrão em versões antigas, e os binários portáteis em `tools/` não são distribuídos neste repositório.
-> Vê a secção [Download dos Binários](#download-dos-binários) antes de usar.
+> Local PHP/Apache file converter for XAMPP, Laragon, WAMP, or any Apache + PHP 8.1+ stack.
 
-O **UniversalConverter** é uma reescrita nativa em PHP para Apache/XAMPP do projeto original. Faz conversões locais de imagens, vetores e ficheiros compatíveis com ImageMagick, sem Flask, Python, ambiente virtual ou servidor emulador.
+UniversalConverter is a native PHP rewrite of the original project. It provides local conversion for images, vectors, documents, audio, and video without Flask, Python, virtual environments, or an emulator server.
 
-## Instalação
+> **Local-use notice:** This application is designed for use on a personal machine through Apache. Do not expose it directly to the public Internet without a dedicated security review and an appropriate authentication layer.
 
-1. Extrai a pasta `UniversalConverter` para `C:\xampp\htdocs\`.
-2. Confirma no `php.ini` do XAMPP que `file_uploads=On`, `upload_max_filesize=100M` e `post_max_size=110M` ou valores superiores estão definidos.
-3. Confirma que `proc_open` não aparece em `disable_functions`.
-4. Inicie ou reinicie o Apache no painel XAMPP.
-5. Abre `http://localhost/UniversalConverter/`.
+## Features
 
-## Download dos Binários
-
-Os executáveis **não estão incluídos no repositório** (ficheiros grandes, não adequados para Git).
-Descarrega e extrai manualmente para as pastas indicadas:
-
-| Pasta em `tools/`        | Binário            | Fonte oficial                                       |
-|--------------------------|--------------------|-----------------------------------------------------|
-| `tools/imagemagick/`     | `magick.exe`       | https://imagemagick.org/script/download.php#windows |
-| `tools/ffmpeg/`          | `ffmpeg.exe`       | https://ffmpeg.org/download.html                    |
-| `tools/pandoc/`          | `pandoc.exe`       | https://github.com/jgm/pandoc/releases              |
-
-Após descarregar, confirma que o executável está directamente dentro da pasta indicada (ex: `tools/ffmpeg/ffmpeg.exe`).
-
-## Funcionalidades
-
-| Função | Comportamento |
+| Area | Supported behavior |
 |---|---|
-| Conversão gráfica | PNG, JPG, WEBP, PDF, GIF, SVG, ICO e outros formatos expostos pela aplicação |
-| Conversão multimédia | MP4, WEBM, MKV, AVI e MOV; extração ou conversão de MP3, WAV, M4A e AAC |
-| Ajustes de imagem | Redimensionamento, rotação e qualidade aplicados pelo ImageMagick |
-| Ajustes de vídeo | Redimensionamento, rotação e qualidade aplicados pelo FFmpeg |
-| Áudio | Conversão de formato; opções visuais são ocultadas porque não se aplicam |
-| Privacidade | O ficheiro é guardado só numa pasta temporária própria do pedido e apagado após o envio |
-| Histórico | Guardado apenas no `localStorage` do navegador e pode ser apagado na interface |
-| Download | O ficheiro é entregue diretamente pelo Apache com o nome `original_convertido.ext` |
+| Graphics | PNG, JPG, WEBP, PDF, GIF, SVG, ICO, and other formats exposed by ImageMagick |
+| Video | MP4, WEBM, MKV, AVI, and MOV conversion with FFmpeg |
+| Audio | MP3, WAV, M4A, AAC, and other FFmpeg-supported formats |
+| Image controls | Resize, rotate, and quality adjustments through ImageMagick |
+| Video controls | Resize, rotate, and quality adjustments through FFmpeg |
+| Privacy | Uploaded files are kept in a request-specific temporary directory and removed after delivery |
+| History | Conversion history is stored only in browser `localStorage` and can be cleared from the interface |
+| Downloads | Converted files are returned directly by Apache as `original_converted.ext` |
 
-## Limites e formatos especiais
+## Installation
 
-A lista da pesquisa é construída a partir do próprio ImageMagick portátil através de `identify -list format` e filtrada para formatos de saída disponíveis nesse binário. Isto evita prometer todos os formatos da documentação geral quando uma biblioteca ou delegado opcional não está incluído. Formatos gráficos comuns, como PNG, JPEG, WEBP, BMP, TIFF, GIF e ICO, são o percurso principal. Ficheiros de vídeo e áudio são encaminhados automaticamente para o FFmpeg; para vídeo, a aplicação cria MP4/MOV com H.264 e AAC, WEBM com VP9/Opus, MKV com H.264/AAC e AVI com MPEG-4/MP3.
+1. Extract the repository into `C:\xampp\htdocs\UniversalConverter`.
+2. In the XAMPP `php.ini`, enable `file_uploads=On`, set `upload_max_filesize=100M`, and set `post_max_size=110M` or higher.
+3. Make sure `proc_open` is not listed in `disable_functions`.
+4. Start or restart Apache from the XAMPP control panel.
+5. Open `http://localhost/UniversalConverter/` in your browser.
 
-A leitura de PDF/EPS/PS e alguns formatos de vídeo pode necessitar de delegados externos, como Ghostscript ou FFmpeg. A conversão de Word, Excel e PowerPoint para PDF no projeto Python original dependia das aplicações Microsoft Office instaladas no Windows através de automação COM; esta versão XAMPP não inclui nem simula Microsoft Office. Para esses documentos, guarde primeiro em PDF numa aplicação de escritório e depois converta o PDF no UniversalConverter.
+The same application can be used with Laragon, WAMP, or another Apache + PHP 8.1+ environment after adapting the document root and PHP configuration.
 
-## Segurança
+## External tools
 
-A aplicação limita cada upload a 100 MB, limita dimensões a 16 000 px, impede acesso web a temporários, bibliotecas e executáveis, bloqueia URLs no ImageMagick e elimina os ficheiros temporários no fim de cada pedido. Não altere `tools/imagemagick/policy.xml` para permitir fontes externas ou caminhos indiretos.
+Runtime executables are intentionally **not committed** because they are large third-party distributions. Download them from their official sources and place the required files in the corresponding directories under `tools/`:
 
-O fetch de URLs (`UrlConverterService`) resolve o host e bloqueia endereços RFC1918 e loopback (`127.x`, `10.x`, `172.16-31.x`, `192.168.x`) para prevenir SSRF.
+| Directory | Tool | Official source |
+|---|---|---|
+| `tools/imagemagick/` | ImageMagick (`magick.exe`, `identify.exe`) | [imagemagick.org](https://imagemagick.org/script/download.php#windows) |
+| `tools/ffmpeg/` | FFmpeg (`ffmpeg.exe`) | [ffmpeg.org](https://ffmpeg.org/download.html) |
+| `tools/pandoc/` | Pandoc (`pandoc.exe`) | [Pandoc releases](https://github.com/jgm/pandoc/releases) |
+| `tools/poppler/` | Poppler PDF utilities | Use a compatible official or distribution-provided build |
 
-## Resolução de problemas
+After installation, confirm that each executable is directly inside the expected directory, for example `tools/ffmpeg/ffmpeg.exe`. See [`tools/README.md`](tools/README.md) for the repository policy on third-party tools.
 
-| Mensagem | Ação recomendada |
+## Formats and limitations
+
+The format search list is generated from the installed ImageMagick distribution through `identify -list format` and filtered to formats available in that build. Common graphics formats such as PNG, JPEG, WEBP, BMP, TIFF, GIF, and ICO are the primary path.
+
+Video and audio inputs are routed to FFmpeg. The application targets MP4/MOV with H.264 and AAC, WEBM with VP9/Opus, MKV with H.264/AAC, and AVI with MPEG-4/MP3. PDF/EPS/PS reading and some video formats may require external delegates such as Ghostscript or FFmpeg.
+
+Conversion of Word, Excel, and PowerPoint files to PDF in the original Python project depended on Microsoft Office automation on Windows. This XAMPP version does not include or emulate Microsoft Office; export those documents to PDF first, then convert the PDF with UniversalConverter.
+
+## Security considerations
+
+The application limits uploads to 100 MB, limits image dimensions to 16,000 px, protects temporary files and libraries from direct web access, blocks URL delegates in ImageMagick, and removes request-specific temporary files after processing. Do not change `tools/imagemagick/policy.xml` to enable external sources or indirect paths.
+
+URL conversion resolves the target host and blocks RFC1918 and loopback ranges, including `127.x`, `10.x`, `172.16.x–172.31.x`, and `192.168.x`, to mitigate server-side request forgery (SSRF). See [`SECURITY.md`](SECURITY.md) before deploying or modifying the application.
+
+## Troubleshooting
+
+| Message or symptom | Recommended action |
 |---|---|
-| `O ImageMagick portátil não foi encontrado` | Confirme que a pasta `tools/imagemagick` foi extraída integralmente |
-| `proc_open` desativado | Remova `proc_open` de `disable_functions` no `php.ini` e reinicie Apache |
-| Formato não suportado | Escolha um formato listado pela busca da interface ou verifique se o formato depende de um delegado externo |
-| Erro `ReadVIDEOImage` | Instale esta atualização: vídeos e áudio são agora processados por FFmpeg, e não pelo ImageMagick |
-| Upload excede o limite | Reduza o ficheiro ou aumente os limites no `php.ini`, mantendo pelo menos o valor da configuração da aplicação |
+| `Portable ImageMagick was not found` | Check that the required ImageMagick files were extracted into `tools/imagemagick/` |
+| `proc_open` is disabled | Remove `proc_open` from `disable_functions` in `php.ini` and restart Apache |
+| Unsupported format | Choose a format listed by the interface or install the delegate required by that format |
+| `ReadVIDEOImage` error | Ensure video and audio inputs are being handled by the current FFmpeg path |
+| Upload exceeds the limit | Reduce the input size or raise PHP limits while keeping the application limit intentional |
+
+## Contributing
+
+Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. Do not commit executables, uploaded files, generated output, credentials, or personal data.
+
+## License
+
+The UniversalConverter source code is released under the [MIT License](LICENSE). The repository also includes third-party notices, including the license for the AnyDoc WASM component in [`licenses/`](licenses/).
