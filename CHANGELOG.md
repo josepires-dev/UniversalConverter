@@ -6,6 +6,12 @@ All notable changes to UniversalConverter are documented in this file. This proj
 
 No unreleased changes yet.
 
+## [1.1.3] - 2026-09-23
+
+### Changed
+
+- Translated the architecture diagram labels to English so the visual documentation matches the English README and project documentation.
+
 ## [1.1.2] - 2026-09-23
 
 ### Fixed
@@ -64,7 +70,8 @@ No unreleased changes yet.
 - A maximum of five redirects and a 5 MiB URL-response limit.
 - Security headers and request-specific temporary-file cleanup.
 
-[Unreleased]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/josepires-dev/UniversalConverter/compare/v1.0.0...v1.1.0
