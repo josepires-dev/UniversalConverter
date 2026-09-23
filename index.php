@@ -17,8 +17,6 @@
     <div class="app-container">
         <header class="app-header">
             <div class="logo"><i class="fa-solid fa-wand-magic-sparkles logo-icon"></i><h1>UniversalConverter</h1></div>
-            <p class="subtitle">Converta imagens, vídeos, áudio, PDFs e vetores com velocidade e privacidade local.</p>
-            <span class="badge"><i class="fa-solid fa-bolt"></i> Powered by ImageMagick</span>
         </header>
         <main class="main-content">
             <div class="glass-card converter-card">
