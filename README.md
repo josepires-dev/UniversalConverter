@@ -7,6 +7,12 @@
 
 UniversalConverter is a native PHP rewrite of the original project. It provides local conversion for images, vectors, documents, audio, and video without Flask, Python, virtual environments, or an emulator server.
 
+## Demo
+
+![UniversalConverter interface](docs/demo.png)
+
+The screenshot shows the main local workflow: upload a file, write text, insert a URL, or combine files. No uploaded content is sent to a third-party service by the application.
+
 ![Architecture](docs/architecture.png)
 
 > **Local-use notice:** This application is designed for use on a personal machine through Apache. Do not expose it directly to the public Internet without a dedicated security review and an appropriate authentication layer.
@@ -31,6 +37,8 @@ UniversalConverter is a native PHP rewrite of the original project. It provides 
 3. Make sure `proc_open` is not listed in `disable_functions`.
 4. Start or restart Apache from the XAMPP control panel.
 5. Open `http://localhost/UniversalConverter/` in your browser.
+
+On Windows, `setup.ps1` or `setup.bat` can prepare the expected folders and run the environment diagnostic. These scripts do not download third-party executables; they intentionally leave that step to the official download sources in [`tools/README.md`](tools/README.md).
 
 After installation, run the environment diagnostic from the project directory:
 
@@ -62,6 +70,28 @@ The format search list is generated from the installed ImageMagick distribution 
 Video and audio inputs are routed to FFmpeg. The application targets MP4/MOV with H.264 and AAC, WEBM with VP9/Opus, MKV with H.264/AAC, and AVI with MPEG-4/MP3. PDF/EPS/PS reading and some video formats may require external delegates such as Ghostscript or FFmpeg.
 
 Conversion of Word, Excel, and PowerPoint files to PDF in the original Python project depended on Microsoft Office automation on Windows. This XAMPP version does not include or emulate Microsoft Office; export those documents to PDF first, then convert the PDF with UniversalConverter.
+
+The interface exposes configured target formats, while actual conversion support depends on the installed tool build and delegates. The most reliable tested paths in this repository are PNG/JPEG/WebP/GIF through ImageMagick, MP4/WEBM/MKV/AVI through FFmpeg, Markdown from TXT/Python/PDF/URL, and Python to IPYNB. Other ImageMagick formats, codecs, PDF delegates, and platform-specific inputs should be treated as installation-dependent.
+
+## API examples
+
+List the formats available in the current installation:
+
+```bash
+curl http://localhost/UniversalConverter/api/formats.php
+```
+
+Convert a text file to Markdown and save the returned file:
+
+```bash
+curl -X POST \
+  -F "file=@notes.txt" \
+  -F "format=md" \
+  http://localhost/UniversalConverter/api/convert.php \
+  -o notes_convertido.md
+```
+
+The conversion endpoint returns the converted file on success and a JSON object such as `{"error":"..."}` on failure. The endpoint is intended for local use and should not be exposed publicly without authentication and an additional security review.
 
 ## Security considerations
 

@@ -16,10 +16,14 @@ if (($argv[1] ?? '') === 'doctor') {
         'PHP >= 8.1' => version_compare(PHP_VERSION, '8.1.0', '>='),
         'proc_open disponível' => function_exists('proc_open'),
         'file_uploads ativo' => filter_var(ini_get('file_uploads'), FILTER_VALIDATE_BOOL),
+        'upload_max_filesize >= 100M' => (int) ini_get('upload_max_filesize') >= 100,
+        'post_max_size >= 110M' => (int) ini_get('post_max_size') >= 110,
         'storage/ pode ser criado' => is_dir($config['storage_root']) || @mkdir($config['storage_root'], 0700, true),
+        'extensão DOM disponível' => class_exists(DOMDocument::class),
         'ImageMagick instalado' => is_file($config['magick_binary']),
         'FFmpeg instalado' => is_file($config['ffmpeg_binary']),
         'Pandoc instalado' => is_file(__DIR__ . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'pandoc' . DIRECTORY_SEPARATOR . 'pandoc.exe'),
+        'pdftotext instalado' => is_file(__DIR__ . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'poppler' . DIRECTORY_SEPARATOR . 'pdftotext.exe'),
         'extensão ZipArchive disponível' => class_exists(ZipArchive::class),
     ];
     $failed = false;
