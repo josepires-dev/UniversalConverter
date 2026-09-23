@@ -23,6 +23,7 @@ $service = new ConverterService($config);
 $formats = $service->formats();
 $assert(in_array('png', $formats, true), 'A lista de formatos deve incluir PNG sem ImageMagick instalado.');
 $assert(in_array('mp4', $formats, true), 'A lista de formatos deve incluir MP4.');
+$assert(in_array('txt', $formats, true), 'TXT deve estar disponível para conversão de PDF.');
 
 if ($failures !== []) {
     fwrite(STDERR, "Smoke tests falharam:\n- " . implode("\n- ", $failures) . "\n");

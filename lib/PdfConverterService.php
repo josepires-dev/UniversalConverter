@@ -49,7 +49,7 @@ final class PdfConverterService
 
             if ($format === 'md') {
                 $text = file_get_contents($output);
-                if ($text !== false && file_put_contents($output, MarkdownFormatter::enhance($text)) === false) {
+                if ($text !== false && file_put_contents($output, MarkdownFormatter::enhancePdf($text)) === false) {
                     throw new ConversionException('Não foi possível gerar o ficheiro Markdown.', 500);
                 }
             }

@@ -13,7 +13,7 @@ return [
         'png', 'jpg', 'jpeg', 'webp', 'pdf', 'gif', 'svg', 'ico', 'bmp', 'tiff', 'tif',
         'avif', 'heic', 'jp2', 'jxl', 'pcx', 'tga', 'dds', 'psd', 'eps', 'ps', 'ppm',
         'pgm', 'pbm', 'pam', 'miff', 'xpm', 'xbm', 'dpx', 'exr', 'hdr', 'wbmp', 'cur',
-        'mp4', 'webm', 'mkv', 'avi', 'mov', 'mp3', 'wav', 'm4a', 'aac', 'ipynb', 'md', 'zip'
+        'mp4', 'webm', 'mkv', 'avi', 'mov', 'mp3', 'wav', 'm4a', 'aac', 'ipynb', 'md', 'txt', 'zip'
     ],
     'quality_formats' => ['jpg', 'jpeg', 'webp', 'tiff', 'tif', 'avif', 'heic'],
     'video_input_extensions' => ['mp4', 'm4v', 'mov', 'mkv', 'avi', 'webm', 'wmv', 'flv', 'mpeg', 'mpg', '3gp'],

@@ -6,6 +6,17 @@ All notable changes to UniversalConverter are documented in this file. This proj
 
 No unreleased changes yet.
 
+## [1.1.2] - 2026-09-23
+
+### Fixed
+
+- PDF files now select the document conversion path in the browser and expose both MD and TXT targets.
+- PDF-to-Markdown post-processing now removes common page numbers, institutional headers and footers, repeated blank blocks, and restores common course metadata tables.
+
+### Added
+
+- Regression coverage for PDF Markdown cleanup and page-noise removal.
+
 ## [1.1.1] - 2026-09-23
 
 ### Added
@@ -53,7 +64,8 @@ No unreleased changes yet.
 - A maximum of five redirects and a 5 MiB URL-response limit.
 - Security headers and request-specific temporary-file cleanup.
 
-[Unreleased]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/josepires-dev/UniversalConverter/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/josepires-dev/UniversalConverter/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/josepires-dev/UniversalConverter/releases/tag/v1.0.0

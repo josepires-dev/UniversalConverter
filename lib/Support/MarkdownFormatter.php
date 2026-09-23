@@ -3,6 +3,31 @@ declare(strict_types=1);
 
 final class MarkdownFormatter
 {
+    public static function enhancePdf(string $text): string
+    {
+        $text = str_replace("\f", "\n", $text);
+        $lines = array_map(static fn (string $line): string => trim($line), explode("\n", str_replace(["\r\n", "\r"], "\n", $text)));
+        $filtered = [];
+        foreach ($lines as $line) {
+            if ($line === '') {
+                $filtered[] = '';
+                continue;
+            }
+            if (preg_match('/^(?:MOD\.|ISTEC Porto(?:\s+\d+)?|Página\s+\d+(?:\s+de\s+\d+)?|Page\s+\d+(?:\s+of\s+\d+)?)$/iu', $line) === 1) {
+                continue;
+            }
+            if (preg_match('/^\d+$/', $line) === 1) {
+                continue;
+            }
+            $filtered[] = $line;
+        }
+
+        $text = implode("\n", $filtered);
+        $text = (string) preg_replace("/\n{3,}/", "\n\n", $text);
+        $text = self::restorePdfMetadataTable($text);
+        return self::enhance($text);
+    }
+
     public static function enhance(string $text, bool $removePromptArtifacts = true): string
     {
         if (trim($text) === '') {
@@ -88,6 +113,33 @@ final class MarkdownFormatter
             $result[] = $line;
         }
 
+        return implode("\n", $result);
+    }
+
+    private static function restorePdfMetadataTable(string $text): string
+    {
+        $lines = explode("\n", $text);
+        $result = [];
+        $metadataHeaderSeen = false;
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if (preg_match('/^PRA[TÁ]TICA.*LABORATORIAL/iu', $trimmed) === 1) {
+                $result[] = '# ' . preg_replace('/\s+/', ' ', $trimmed);
+                $metadataHeaderSeen = true;
+                continue;
+            }
+            if (preg_match('/^CURSO\s+UNIDADE CURRICULAR$/iu', $trimmed) === 1) {
+                $result[] = '| Curso | Unidade curricular |';
+                $result[] = '| --- | --- |';
+                $metadataHeaderSeen = true;
+                continue;
+            }
+            if ($metadataHeaderSeen && preg_match('/^(.+?)\s{2,}(.+)$/u', $trimmed, $matches) === 1) {
+                $result[] = '| ' . trim($matches[1]) . ' | ' . trim($matches[2]) . ' |';
+                continue;
+            }
+            $result[] = $line;
+        }
         return implode("\n", $result);
     }
 }

@@ -24,6 +24,9 @@ try {
     if (in_array('md', $config['allowed_output_formats']) && !in_array('md', $formats)) {
         $formats[] = 'md';
     }
+    if (in_array('txt', $config['allowed_output_formats'], true) && !in_array('txt', $formats, true)) {
+        $formats[] = 'txt';
+    }
     if (in_array('zip', $config['allowed_output_formats']) && !in_array('zip', $formats)) {
         $formats[] = 'zip';
     }

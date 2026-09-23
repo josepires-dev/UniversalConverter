@@ -71,7 +71,7 @@ Video and audio inputs are routed to FFmpeg. The application targets MP4/MOV wit
 
 Conversion of Word, Excel, and PowerPoint files to PDF in the original Python project depended on Microsoft Office automation on Windows. This XAMPP version does not include or emulate Microsoft Office; export those documents to PDF first, then convert the PDF with UniversalConverter.
 
-The interface exposes configured target formats, while actual conversion support depends on the installed tool build and delegates. The most reliable tested paths in this repository are PNG/JPEG/WebP/GIF through ImageMagick, MP4/WEBM/MKV/AVI through FFmpeg, Markdown from TXT/Python/PDF/URL, and Python to IPYNB. Other ImageMagick formats, codecs, PDF delegates, and platform-specific inputs should be treated as installation-dependent.
+The interface exposes configured target formats, while actual conversion support depends on the installed tool build and delegates. The most reliable tested paths in this repository are PNG/JPEG/WebP/GIF through ImageMagick, MP4/WEBM/MKV/AVI through FFmpeg, Markdown or TXT from TXT/Python/PDF/URL, and Python to IPYNB. Other ImageMagick formats, codecs, PDF delegates, and platform-specific inputs should be treated as installation-dependent.
 
 ## API examples
 

@@ -224,11 +224,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function getAvailableFormats() {
-        const allowed = COMPATIBLE_FORMATS[selectedMediaKind] || COMPATIBLE_FORMATS.image;
+        const allowed = [...(COMPATIBLE_FORMATS[selectedMediaKind] || COMPATIBLE_FORMATS.image)];
+        const extension = selectedFile?.name.split('.').pop().toLowerCase();
+        if (extension === 'pdf') {
+            allowed.push('md', 'txt');
+        }
         if (allFormats.length > 0) {
             return allFormats.filter((fmt) => allowed.includes(fmt));
         }
-        return allowed;
+        return [...new Set(allowed)];
     }
 
     function updatePlaceholder() {
@@ -275,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (file.type.startsWith('image/')) {
             selectedMediaKind = 'image'; icon.className = 'fa-solid fa-file-image file-type-icon'; updateSelectedFormat('png');
         } else if (extension === 'pdf') {
-            selectedMediaKind = 'image'; icon.className = 'fa-solid fa-file-pdf file-type-icon'; icon.style.color = '#e01b22'; updateSelectedFormat('png');
+            selectedMediaKind = 'document'; icon.className = 'fa-solid fa-file-pdf file-type-icon'; icon.style.color = '#e01b22'; updateSelectedFormat('md');
         } else if (extension === 'url') {
             selectedMediaKind = 'document'; icon.className = 'fa-solid fa-link file-type-icon'; icon.style.color = '#1b73e8'; updateSelectedFormat('md');
         } else if (['doc', 'docx', 'docm', 'ppt', 'pptx', 'pptm', 'pps', 'ppsx', 'ppsm', 'pot', 'xls', 'xlsx', 'xlsm', 'xlsb', 'odt', 'ods', 'odp', 'rtf', 'epub', 'csv', 'txt', 'py', 'json', 'md', 'html', 'log'].includes(extension)) {

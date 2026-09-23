@@ -6,6 +6,7 @@ $config = require $root . DIRECTORY_SEPARATOR . 'config.php';
 require_once $root . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'ConverterService.php';
 require_once $root . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'TextConverterService.php';
 require_once $root . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'NotebookConverterService.php';
+require_once $root . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Support' . DIRECTORY_SEPARATOR . 'MarkdownFormatter.php';
 
 $failures = [];
 $assert = static function (bool $condition, string $message) use (&$failures): void {
@@ -28,6 +29,12 @@ $assert(
     ConversionSupport::outputName('../relatório: final.png', 'webp') === 'relatório_ final_convertido.webp',
     'O nome de saída deve ser seguro e previsível.'
 );
+
+$pdfMarkdown = MarkdownFormatter::enhancePdf("PRÁTICA LABORATORIAL\nCURSO  UNIDADE CURRICULAR\nEngenharia  Cibersegurança\nISTEC Porto\n1\nPágina 1 de 2\n\nConteúdo principal\n\n\n");
+$assert(str_contains($pdfMarkdown, '| Curso | Unidade curricular |'), 'O PDF deve preservar a tabela de metadados.');
+$assert(str_contains($pdfMarkdown, 'Conteúdo principal'), 'O PDF deve preservar o conteúdo principal.');
+$assert(!str_contains($pdfMarkdown, 'ISTEC Porto'), 'O PDF deve remover cabeçalhos institucionais repetidos.');
+$assert(!preg_match('/\n1\n/', "\n{$pdfMarkdown}\n"), 'O PDF deve remover números de página isolados.');
 
 $directory = ConversionSupport::createTaskDirectory($config);
 $assert(is_dir($directory), 'A pasta temporária deve ser criada.');
