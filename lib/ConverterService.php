@@ -116,8 +116,12 @@ final class ConverterService
     /** @return array<string, true> */
     private function writableMagickFormats(): array
     {
+        $binary = (string) $this->config['magick_binary'];
+        if (!is_file($binary)) {
+            return [];
+        }
         $descriptors = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-        $process = @proc_open([$this->resolveMagick(), 'identify', '-list', 'format'], $descriptors, $pipes, null, null, ['bypass_shell' => true]);
+        $process = @proc_open([$binary, 'identify', '-list', 'format'], $descriptors, $pipes, null, null, ['bypass_shell' => true]);
         if (!is_resource($process)) {
             return [];
         }

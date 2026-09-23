@@ -32,26 +32,7 @@ final class UrlConverterService
             // SSRF guard: block private/reserved IP ranges
             $this->blockPrivateAddress($url);
 
-            // Fetch HTML content
-            $context = stream_context_create([
-                'http' => [
-                    'header' => "User-Agent: UniversalConverter/1.0\r\n",
-                    'timeout' => 15,
-                    'follow_location' => 1,
-                    'max_redirects' => 5,
-                    'ignore_errors' => true,
-                ],
-                'ssl' => [
-                    'verify_peer' => true,
-                    'verify_peer_name' => true,
-                ],
-            ]);
-            $html = @file_get_contents($url, false, $context);
-            $statusCode = $this->responseStatusCode($http_response_header ?? []);
-            if ($html === false || $statusCode < 200 || $statusCode >= 400) {
-                $detail = $statusCode > 0 ? " (HTTP {$statusCode})" : '';
-                throw new ConversionException('Não foi possível aceder ao website especificado' . $detail . '.', 422);
-            }
+            $html = $this->fetchUrl($url);
             if (trim($html) === '') {
                 throw new ConversionException('O website especificado não devolveu conteúdo HTML.', 422);
             }
@@ -107,7 +88,7 @@ final class UrlConverterService
         if (!is_file($binary)) {
             throw new ConversionException('O Pandoc não foi encontrado na pasta tools/pandoc.', 500);
         }
-        return escapeshellarg($binary);
+        return $binary;
     }
 
     /** @param array<string, mixed> $file @return array{string,string} */
@@ -135,18 +116,13 @@ final class UrlConverterService
     /** @param list<string> $command */
     private function execute(array $command, string $workingDirectory): void
     {
-        $cmdLine = $command[0];
-        for ($i = 1; $i < count($command); $i++) {
-            $cmdLine .= ' ' . escapeshellarg($command[$i]);
-        }
-
         $descriptors = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w']
         ];
         
-        $process = proc_open($cmdLine, $descriptors, $pipes, $workingDirectory, null, ['bypass_shell' => true]);
+        $process = proc_open($command, $descriptors, $pipes, $workingDirectory, null, ['bypass_shell' => true]);
         
         if (!is_resource($process)) {
             throw new ConversionException('Não foi possível iniciar o Pandoc.', 500);
@@ -389,17 +365,96 @@ final class UrlConverterService
      */
     private function blockPrivateAddress(string $url): void
     {
+        $scheme = strtolower((string) (parse_url($url, PHP_URL_SCHEME) ?? ''));
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            throw new ConversionException('O URL deve utilizar HTTP ou HTTPS.', 400);
+        }
         $host = (string) (parse_url($url, PHP_URL_HOST) ?? '');
         $host = trim($host, '[]'); // strip IPv6 brackets
         if ($host === '') {
             throw new ConversionException('O URL não contém um host válido.', 400);
         }
-        $ip = gethostbyname($host);
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        $ips = [];
+        foreach (dns_get_record($host, DNS_A | DNS_AAAA) ?: [] as $record) {
+            if (isset($record['ip'])) $ips[] = $record['ip'];
+            if (isset($record['ipv6'])) $ips[] = $record['ipv6'];
+        }
+        if ($ips === []) {
+            $resolved = gethostbyname($host);
+            if ($resolved !== $host) $ips[] = $resolved;
+        }
+        if ($ips === [] || array_filter($ips, static fn (string $ip): bool => !filter_var($ip, FILTER_VALIDATE_IP))) {
             throw new ConversionException('Não foi possível resolver o host do URL.', 422);
         }
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-            throw new ConversionException('O URL aponta para um endereço privado ou reservado.', 400);
+        foreach ($ips as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                throw new ConversionException('O URL aponta para um endereço privado ou reservado.', 400);
+            }
         }
+    }
+
+    private function fetchUrl(string $url): string
+    {
+        $current = $url;
+        for ($redirect = 0; $redirect <= 5; $redirect++) {
+            $this->blockPrivateAddress($current);
+            $context = stream_context_create([
+                'http' => [
+                    'header' => "User-Agent: UniversalConverter/1.0\r\n",
+                    'timeout' => 15,
+                    'follow_location' => 0,
+                    'ignore_errors' => true,
+                ],
+                'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
+            ]);
+            $stream = @fopen($current, 'rb', false, $context);
+            $headers = $http_response_header ?? [];
+            $statusCode = $this->responseStatusCode($headers);
+            if ($stream === false) {
+                throw new ConversionException('Não foi possível aceder ao website especificado.', 422);
+            }
+            if ($statusCode >= 300 && $statusCode < 400) {
+                fclose($stream);
+                $location = $this->headerValue($headers, 'Location');
+                if ($location === null || $redirect === 5) {
+                    throw new ConversionException('O website excedeu o limite de redirecionamentos.', 422);
+                }
+                $current = $this->resolveRedirect($current, $location);
+                continue;
+            }
+            if ($statusCode < 200 || $statusCode >= 400) {
+                fclose($stream);
+                $detail = $statusCode > 0 ? " (HTTP {$statusCode})" : '';
+                throw new ConversionException('Não foi possível aceder ao website especificado' . $detail . '.', 422);
+            }
+            $html = stream_get_contents($stream, 5 * 1024 * 1024 + 1);
+            fclose($stream);
+            if ($html === false || strlen($html) > 5 * 1024 * 1024) {
+                throw new ConversionException('O website excede o limite de 5 MB.', 413);
+            }
+            return $html;
+        }
+        throw new ConversionException('Não foi possível seguir o URL especificado.', 422);
+    }
+
+    /** @param list<string> $headers */
+    private function headerValue(array $headers, string $name): ?string
+    {
+        foreach ($headers as $header) {
+            if (str_starts_with(strtolower($header), strtolower($name) . ':')) {
+                return trim(substr($header, strlen($name) + 1));
+            }
+        }
+        return null;
+    }
+
+    private function resolveRedirect(string $base, string $location): string
+    {
+        if (filter_var($location, FILTER_VALIDATE_URL)) return $location;
+        $parts = parse_url($base);
+        if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host']) || !str_starts_with($location, '/')) {
+            throw new ConversionException('O redirecionamento devolvido pelo website é inválido.', 422);
+        }
+        return $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '') . $location;
     }
 }

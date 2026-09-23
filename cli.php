@@ -11,8 +11,30 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Medi
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'NotebookConverterService.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'TextConverterService.php';
 
+if (($argv[1] ?? '') === 'doctor') {
+    $checks = [
+        'PHP >= 8.1' => version_compare(PHP_VERSION, '8.1.0', '>='),
+        'proc_open disponível' => function_exists('proc_open'),
+        'file_uploads ativo' => filter_var(ini_get('file_uploads'), FILTER_VALIDATE_BOOL),
+        'storage/ pode ser criado' => is_dir($config['storage_root']) || @mkdir($config['storage_root'], 0700, true),
+        'ImageMagick instalado' => is_file($config['magick_binary']),
+        'FFmpeg instalado' => is_file($config['ffmpeg_binary']),
+        'Pandoc instalado' => is_file(__DIR__ . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'pandoc' . DIRECTORY_SEPARATOR . 'pandoc.exe'),
+        'extensão ZipArchive disponível' => class_exists(ZipArchive::class),
+    ];
+    $failed = false;
+    echo "UniversalConverter environment doctor\n\n";
+    foreach ($checks as $label => $ok) {
+        printf("[%s] %s\n", $ok ? 'OK' : 'FAIL', $label);
+        $failed = $failed || !$ok;
+    }
+    echo "\n" . ($failed ? "Instalação incompleta: consulte tools/README.md.\n" : "Ambiente pronto para executar o UniversalConverter.\n");
+    exit($failed ? 1 : 0);
+}
+
 if ($argc < 3) {
     echo "UniversalConverter CLI\n";
+    echo "Diagnóstico: php cli.php doctor\n";
     echo "Uso: php cli.php <ficheiro_entrada> <formato_saida> [largura] [altura] [qualidade]\n";
     echo "Exemplo: php cli.php meu_script.py md\n";
     echo "Exemplo: php cli.php imagem.jpg png 800 600\n";

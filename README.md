@@ -1,8 +1,13 @@
 # UniversalConverter
 
+[![CI](https://github.com/josepires-dev/UniversalConverter/actions/workflows/ci.yml/badge.svg)](https://github.com/josepires-dev/UniversalConverter/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Local PHP/Apache file converter for XAMPP, Laragon, WAMP, or any Apache + PHP 8.1+ stack.
 
 UniversalConverter is a native PHP rewrite of the original project. It provides local conversion for images, vectors, documents, audio, and video without Flask, Python, virtual environments, or an emulator server.
+
+![Architecture](docs/architecture.png)
 
 > **Local-use notice:** This application is designed for use on a personal machine through Apache. Do not expose it directly to the public Internet without a dedicated security review and an appropriate authentication layer.
 
@@ -27,6 +32,14 @@ UniversalConverter is a native PHP rewrite of the original project. It provides 
 4. Start or restart Apache from the XAMPP control panel.
 5. Open `http://localhost/UniversalConverter/` in your browser.
 
+After installation, run the environment diagnostic from the project directory:
+
+```powershell
+php cli.php doctor
+```
+
+The command checks PHP, `proc_open`, upload settings, writable temporary storage, the PHP ZIP extension and the external executables required by each conversion mode.
+
 The same application can be used with Laragon, WAMP, or another Apache + PHP 8.1+ environment after adapting the document root and PHP configuration.
 
 ## External tools
@@ -40,7 +53,7 @@ Runtime executables are intentionally **not committed** because they are large t
 | `tools/pandoc/` | Pandoc (`pandoc.exe`) | [Pandoc releases](https://github.com/jgm/pandoc/releases) |
 | `tools/poppler/` | Poppler PDF utilities | Use a compatible official or distribution-provided build |
 
-After installation, confirm that each executable is directly inside the expected directory, for example `tools/ffmpeg/ffmpeg.exe`. See [`tools/README.md`](tools/README.md) for the repository policy on third-party tools.
+After installation, confirm that each executable is directly inside the expected directory, for example `tools/ffmpeg/ffmpeg.exe`. See [`tools/README.md`](tools/README.md) for download links, expected paths and the repository policy on third-party tools.
 
 ## Formats and limitations
 
@@ -69,6 +82,8 @@ URL conversion resolves the target host and blocks RFC1918 and loopback ranges, 
 ## Contributing
 
 Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. Do not commit executables, uploaded files, generated output, credentials, or personal data.
+
+Every push and pull request is checked by GitHub Actions on PHP 8.1, 8.2 and 8.3. The CI job runs PHP syntax validation, smoke tests and documentation checks. Run the same smoke tests locally with `php tests/smoke.php`.
 
 ## License
 

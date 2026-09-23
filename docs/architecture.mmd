@@ -1,0 +1,14 @@
+flowchart LR
+    Browser[Browser local] --> UI[index.php + app.js]
+    UI --> Formats[api/formats.php]
+    UI --> Convert[api/convert.php]
+    Convert --> Router{Tipo de entrada}
+    Router --> Image[ImageMagick]
+    Router --> Media[FFmpeg]
+    Router --> Docs[Pandoc / conversores de texto]
+    Router --> URL[URL fetcher com proteção SSRF]
+    Image --> Temp[(storage/tmp)]
+    Media --> Temp
+    Docs --> Temp
+    URL --> Temp
+    Temp --> Download[Download e limpeza imediata]

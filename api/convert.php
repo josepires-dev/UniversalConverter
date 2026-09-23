@@ -31,7 +31,11 @@ try {
     $name = strtolower((string) ($_FILES['file']['name'] ?? ''));
     $extension = strtolower((string) pathinfo($name, PATHINFO_EXTENSION));
     $mediaExtensions = array_merge($config['video_input_extensions'], $config['audio_input_extensions']);
-    $targetFormat = strtolower($_POST['format'] ?? '');
+    $rawTargetFormat = $_POST['format'] ?? '';
+    if (!is_string($rawTargetFormat)) {
+        sendJson(['error' => 'O formato de saída é inválido.'], 400);
+    }
+    $targetFormat = strtolower($rawTargetFormat);
     
     if ($extension === 'py' && $targetFormat === 'ipynb') {
         require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'NotebookConverterService.php';
