@@ -1,0 +1,27 @@
+# Binários portáteis — descarregar separadamente (ver README)
+tools/
+
+# Armazenamento temporário em runtime
+storage/
+
+# Ficheiros de teste e desenvolvimento
+test_*.py
+test_*.php
+test_*.txt
+test_*.md
+test_*.url
+test_*.pdf
+create_tests.php
+result.ipynb
+*.ipynb
+
+# Outputs de conversão gerados localmente
+*_convertido.*
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+.idea/
+.vscode/
