@@ -27,6 +27,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
+          extensions: dom, zip
 
       - name: Check PHP syntax
         shell: bash
@@ -37,10 +38,14 @@ jobs:
       - name: Run smoke tests
         run: php tests/smoke.php
 
+      - name: Run regression tests
+        run: php tests/regression.php
+
       - name: Validate required documentation
         shell: bash
         run: |
           test -f README.md
+          test -f CHANGELOG.md
           test -f SECURITY.md
           test -f CONTRIBUTING.md
           test -f tools/README.md

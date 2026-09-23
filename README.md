@@ -83,7 +83,11 @@ URL conversion resolves the target host and blocks RFC1918 and loopback ranges, 
 
 Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. Do not commit executables, uploaded files, generated output, credentials, or personal data.
 
-Every push and pull request is checked by GitHub Actions on PHP 8.1, 8.2 and 8.3. The CI job runs PHP syntax validation, smoke tests and documentation checks. Run the same smoke tests locally with `php tests/smoke.php`.
+Every push and pull request is checked by GitHub Actions on PHP 8.1, 8.2 and 8.3. The CI job runs PHP syntax validation, smoke tests, regression tests and documentation checks. Run the same validation locally with `php tests/smoke.php` and `php tests/regression.php`.
+
+## Releases and maintenance
+
+Released versions use [Semantic Versioning](https://semver.org/). The full history of user-visible changes is maintained in [`CHANGELOG.md`](CHANGELOG.md); GitHub Releases provide a downloadable snapshot for each stable version. Dependabot checks the GitHub Actions workflow weekly and opens a pull request when an action needs an update.
 
 ## License
 
