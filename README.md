@@ -119,6 +119,11 @@ Every push and pull request is checked by GitHub Actions on PHP 8.1, 8.2 and 8.3
 
 Released versions use [Semantic Versioning](https://semver.org/). The full history of user-visible changes is maintained in [`CHANGELOG.md`](CHANGELOG.md); GitHub Releases provide a downloadable snapshot for each stable version. Dependabot checks the GitHub Actions workflow weekly and opens a pull request when an action needs an update.
 
+## Related projects
+
+- [**MediaForge**](https://github.com/josepires-dev/MediaForge): the Windows desktop version (WinUI 3) with a ready-to-run installer, no Apache or PHP needed.
+- [**UniversalDownloader**](https://github.com/josepires-dev/UniversalDownloader): local PHP/Apache downloader for videos and audio (MP4, MP3, playlists) built on yt-dlp and FFmpeg.
+
 ## License
 
 The UniversalConverter source code is released under the [MIT License](LICENSE). The repository also includes third-party notices, including the license for the AnyDoc WASM component in [`licenses/`](licenses/).
